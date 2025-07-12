@@ -24,9 +24,9 @@ image = (
         [
             "cd /mojo_app && /root/.pixi/bin/pixi install",
             "cd /mojo_app && /root/.pixi/bin/pixi run pip install max",
-            "cd /mojo_app && /root/.pixi/bin/pixi run mojo build mojo_module.mojo --emit shared-lib",
-            "cd /mojo_app && /root/.pixi/bin/pixi run mojo build factorial_standalone.mojo -o mojo_factorial",  # can also build a binary during image setup
-            "file /mojo_app/mojo_factorial",  # binary exists!
+            # "cd /mojo_app && /root/.pixi/bin/pixi run mojo build mojo_module.mojo --emit shared-lib",
+            # "cd /mojo_app && /root/.pixi/bin/pixi run mojo build factorial_standalone.mojo -o mojo_factorial",  # can also build a binary during image setup
+            # "file /mojo_app/mojo_factorial",  # binary exists!
             "cd /mojo_app && /root/.pixi/bin/pixi run python -c 'import max.mojo.importer; print(\"MAX SDK available\")'",
         ]
     )
