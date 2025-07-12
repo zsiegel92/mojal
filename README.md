@@ -47,3 +47,7 @@ Mojo module imported successfully!
 Calling factorial(5) with interop...
 factorial(5) = 120
 ```
+
+# TODO:
+
+- Mojo is designed to use GPUs. Modal can provision GPUs. Can Mojo access the GPU through Python interop? I assume yes.
