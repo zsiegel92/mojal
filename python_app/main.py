@@ -24,10 +24,9 @@ image = (
         [
             "cd /mojo_app && /root/.pixi/bin/pixi install",
             "cd /mojo_app && /root/.pixi/bin/pixi run pip install max",
-            # "cd /mojo_app && /root/.pixi/bin/pixi run mojo build mojo_module.mojo --emit shared-lib",
+            # "cd /mojo_app && /root/.pixi/bin/pixi run mojo build mojo_module.mojo --emit shared-lib",  # can also build a binary during image setup
             # "cd /mojo_app && /root/.pixi/bin/pixi run mojo build factorial_standalone.mojo -o mojo_factorial",  # can also build a binary during image setup
             # "file /mojo_app/mojo_factorial",  # binary exists!
-            "cd /mojo_app && /root/.pixi/bin/pixi run python -c 'import max.mojo.importer; print(\"MAX SDK available\")'",
         ]
     )
     .add_local_dir(
@@ -43,11 +42,14 @@ app = modal.App(name="hello-mojal", image=image)
 @app.function()
 def hello_world():
     import sys
-    import os # noqa: F401
+    import os  # noqa: F401
+
     sys.path.insert(0, "/mojo_app")
     import max.mojo.importer  # type: ignore # noqa: F401
+
     print("MAX SDK imported successfully!")
     import mojo_module  # type: ignore
+
     print("Mojo module imported successfully!")
     print("Calling factorial(5) with interop...")
     result = mojo_module.factorial(5)
