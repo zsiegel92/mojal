@@ -24,7 +24,8 @@ image = (
         [
             "cd /mojo_app && /root/.pixi/bin/pixi install",
             "cd /mojo_app && /root/.pixi/bin/pixi run pip install max",
-            # "cd /mojo_app && /root/.pixi/bin/pixi run mojo build mojo_module.mojo --emit shared-lib",  # can also build a binary during image setup
+            "cd /mojo_app && /root/.pixi/bin/pixi run mojo build mojo_module.mojo --emit shared-lib",  # not necessary, but pre-building should be faster than compiling on demand
+            "file /mojo_app/mojo_module.so", # shared library exists!
             # "cd /mojo_app && /root/.pixi/bin/pixi run mojo build factorial_standalone.mojo -o mojo_factorial",  # can also build a binary during image setup
             # "file /mojo_app/mojo_factorial",  # binary exists!
         ]
@@ -37,7 +38,6 @@ image = (
 )
 
 app = modal.App(name="hello-mojal", image=image)
-
 
 @app.function()
 def hello_world():
@@ -54,6 +54,8 @@ def hello_world():
     print("Calling factorial(5) with interop...")
     result = mojo_module.factorial(5)
     print(f"factorial(5) = {result}")
+
+
 
 
 # python -m modal run python_app/main.py

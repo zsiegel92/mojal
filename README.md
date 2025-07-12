@@ -1,14 +1,20 @@
+# Running Mojo from Modal
 
+Mojo is interesting but it's hard to be creative with it without a good app deployment story. Deploying Python apps on Modal is easy and Mojo provides Python interop means we can run Mojo programs from a Modal app.
 
-# Setup locally
+What would you run in Mojo? That's kind of like asking "when should I use a numpy matrix instead of a `list` of `list`s?" - any custom matrix arithmetic would be a good candidate, or an optimization algorithm.
 
-1. Install `pixi`: `curl -fsSL https://pixi.sh/install.sh | sh`
-2. Init mojo project:
+# Install
+
+```sh
+cd python_app
+uv venv
+source .venv/bin/activate
+uv sync
 ```
-pixi init mojo_app \
-  -c https://conda.modular.com/max-nightly/ -c conda-forge \
-  && cd mojo_app
-pixi add modular
-# add `main.mojo`
-mojo main.mojo
+
+# Run
+
+```sh
+python -m modal run python_app/main.py
 ```
