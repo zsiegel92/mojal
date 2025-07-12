@@ -18,3 +18,32 @@ uv sync
 ```sh
 python -m modal run python_app/main.py
 ```
+
+Output:
+
+```
+(mojal) /.../mojal  python -m modal run python_app/main.py
+✓ Initialized. View run at 
+https://modal.com/apps/zsiegel92/main/ap-dEuUbfbXs4SAOkutnPEIQf
+Building image im-oJ87h9pXVYWAz1eF9AjUSj
+
+=> Step 0: FROM base
+
+=> Step 1: COPY . /
+Saving image...
+Image saved, took 9.64s
+
+Built image im-oJ87h9pXVYWAz1eF9AjUSj in 11.73s
+
+
+✓ Created objects.
+├── 🔨 Created mount 
+│   /.../mojal/python_app/main.py
+├── 🔨 Created mount /.../mojal/mojo_app
+├── 🔨 Created mount /.../mojal/python_app
+└── 🔨 Created function hello_world.
+MAX SDK imported successfully!
+Mojo module imported successfully!
+Calling factorial(5) with interop...
+factorial(5) = 120
+```
