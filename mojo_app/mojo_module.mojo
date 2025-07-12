@@ -21,7 +21,3 @@ fn factorial(py_obj: PythonObject) raises -> PythonObject:
     var n = Int(py_obj)
 
     return math.factorial(n)
-
-
-def main():
-    print(factorial(10))
