@@ -1,34 +1,40 @@
 import modal
 
 image = (
-    modal.Image.debian_slim(python_version="3.12")
-    .apt_install("build-essential")  # Full build toolchain including g++, make, etc.
+    modal.Image.from_registry("ubuntu:22.04", add_python="3.12")
+    .apt_install(
+        "build-essential", "curl", "file"
+    )  # Full build toolchain including g++, make, etc.
     .pip_install("uv")
     .run_commands("uv pip install --compile-bytecode --system modal")
     .run_commands(
-        "uv pip install --compile-bytecode --system modular --extra-index-url https://download.pytorch.org/whl/cpu  --index-url https://dl.modular.com/public/nightly/python/simple/  --index-strategy unsafe-best-match --prerelease allow"
+        # Install Pixi
+        "curl -fsSL https://pixi.sh/install.sh | sh"
     )
-    .run_commands(
-        [
-            "uv pip freeze",
-            'python -c "import sys; print(sys.path)"',
-            'python -c "import max; print(max.__file__)" || echo "max import failed"',
-            'python -c "import max.mojo; print(max.mojo.__file__)" || echo "max.mojo import failed"',
-            'which g++ || echo "g++ not found"',
-        ]
-    )
+    .env({"PATH": "/root/.pixi/bin:$PATH"})  # Add pixi to PATH
     .add_local_dir(
         "mojo_app",
-        remote_path="/",
+        remote_path="/mojo_app",
         copy=True,
         ignore=["**/.pixi/*"],
     )
     .add_local_dir(
         "python_app",
-        remote_path="/",
+        remote_path="/python_app",
         copy=True,
     )
-    .run_commands(["uv pip freeze"])
+    .run_commands(
+        [
+            # Set up the Mojo project with Pixi
+            "cd /mojo_app && /root/.pixi/bin/pixi install",
+            # Build the Mojo shared library
+            "cd /mojo_app && /root/.pixi/bin/pixi run mojo build mojo_module.mojo --emit shared-lib",
+            # Verify the build and check file type
+            "ls -la /mojo_app/mojo_module.so",
+            "file /mojo_app/mojo_module.so",
+            # "head -c 20 /mojo_app/mojo_module.so | xxd",
+        ]
+    )
 )
 
 app = modal.App(name="hello-mojal", image=image)
@@ -38,50 +44,27 @@ app = modal.App(name="hello-mojal", image=image)
 def hello_world():
     import sys
     import os
-    import subprocess
 
-    print("Compiling Mojo module for Linux...")
+    print("Using pre-built Mojo module...")
 
-    # Check if mojo CLI is available
-    try:
-        result = subprocess.run(["mojo", "--version"], capture_output=True, text=True)
-        print("Mojo version:", result.stdout.strip())
-    except FileNotFoundError:
-        print("Mojo CLI not found!")
+    # Check if the pre-built shared library exists
+    if os.path.exists("/mojo_app/mojo_module.so"):
+        print("Found pre-built Mojo shared library!")
+    else:
+        print("Pre-built Mojo shared library not found!")
         return
 
-    # Compile the Mojo module for Linux
-    if os.path.exists("/mojo_module.mojo"):
-        print("Compiling mojo_module.mojo...")
-        result = subprocess.run(
-            [
-                "mojo",
-                "build",
-                "/mojo_module.mojo",
-                "--emit",
-                "shared-lib",
-                "-o",
-                "/mojo_module_linux.so",
-            ],
-            capture_output=True,
-            text=True,
-        )
+    # Add mojo_app directory to Python path
+    sys.path.insert(0, "/mojo_app")
 
-        if result.returncode != 0:
-            print("Mojo compilation failed:")
-            print("STDOUT:", result.stdout)
-            print("STDERR:", result.stderr)
-            return
-        else:
-            print("Mojo compilation successful!")
+    # Import the compiled mojo module
+    import mojo_module  # type: ignore
 
-    # Add root directory to Python path
-    sys.path.insert(0, "/")
+    print("Calling factorial(5)...")
+    result = mojo_module.factorial(5)
+    print(f"factorial(5) = {result}")
 
-    # Import the Linux-compiled mojo module
-    import mojo_module_linux as mojo_module  # type: ignore
-
-    print(mojo_module.factorial(5))
+    return result
 
 
 # python -m modal run python_app/main.py
