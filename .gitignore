@@ -1,13 +1,13 @@
 # Python-generated files
-__pycache__/
+**/__pycache__/
 *.py[oc]
 build/
 dist/
 wheels/
 *.egg-info
 .ruff_cache/
-__mojocache__/
-
+**/__mojocache__/
+**/.DS_Store
 # Virtual environments
 .venv
 **/.pixi/
