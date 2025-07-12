@@ -1,2 +1,4 @@
 curl -fsSL https://pixi.sh/install.sh | sh
-/root/.pixi/bin/pixi init
+cd /root/mojo_app
+/root/.pixi/bin/pixi install
+mojo build /root/mojo_app/main.mojo -o /root/main_mojo
